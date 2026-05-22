@@ -1,0 +1,1 @@
+1. Cassandra koristi port 9042, služi za CQL klijentske konekcije. Nema browser sučelje jer je dizajnirana za visoke performanse za ogromne količine podataka, a user interface je puno manje bitan.

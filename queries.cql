@@ -1,3 +1,53 @@
 // Zadatak 1
 
 SELECT now() FROM system.local; 
+
+// Korak 2
+
+CREATE KEYSPACE IF NOT EXISTS vjezba
+  WITH replication = {
+    'class': 'SimpleStrategy',
+    'replication_factor': 1
+  };
+
+USE vjezba;
+
+CREATE TABLE narudzbe (
+  korisnik_id UUID,
+  created_at  TIMESTAMP,
+  narudzba_id UUID,
+  ukupno      DECIMAL,
+  status      TEXT,
+  grad        TEXT,
+  PRIMARY KEY (korisnik_id, created_at)
+) WITH CLUSTERING ORDER BY (created_at DESC);
+
+CREATE TABLE proizvodi (
+  id          UUID PRIMARY KEY,
+  naziv       TEXT,
+  cijena      DECIMAL,
+  kategorija  TEXT,
+  dostupnost  BOOLEAN
+);
+
+CREATE TABLE recenzije (
+  proizvod_id UUID,
+  korisnik_id UUID,
+  ocjena      INT,
+  komentar    TEXT,
+  created_at  TIMESTAMP,
+  PRIMARY KEY (proizvod_id, korisnik_id)
+);
+
+DESCRIBE TABLES;
+DESCRIBE TABLE narudzbe;
+
+// Zadatak 2
+
+CREATE TABLE IF NOT EXISTS pregledi_proizvoda (
+    korisnik_id UUID,
+    datum_pregleda DATE,
+    proizvod_id UUID,
+    broj_pregleda INT,
+    PRIMARY KEY ((korisnik_id, datum_pregleda), proizvod_id)
+);

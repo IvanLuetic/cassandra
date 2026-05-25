@@ -194,3 +194,70 @@ SELECT *
 FROM narudzbe 
 WHERE korisnik_id = a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e 
   AND created_at = '2024-01-15 11:00:00';
+
+--Korak 5
+
+-- Ažuriranje statusa narudžbe (mora specificirati puni primary key)
+UPDATE narudzbe
+SET status = 'isporuceno'
+WHERE korisnik_id = 22222222-2222-2222-2222-222222222222
+  AND created_at = <timestamp-narudzbe>;  -- kopiraj iz SELECT upita
+
+-- Ažuriranje više polja odjednom
+UPDATE narudzbe
+SET status = 'u_obradi', grad = 'Rijeka'
+WHERE korisnik_id = 22222222-2222-2222-2222-222222222222
+  AND created_at = <timestamp-narudzbe>;
+
+-- Brisanje jedne narudžbe
+DELETE FROM narudzbe
+WHERE korisnik_id = 33333333-3333-3333-3333-333333333333
+  AND created_at = <timestamp-narudzbe>;
+
+-- Brisanje samo jednog stupca (ostavlja red, briše vrijednost)
+DELETE komentar FROM recenzije
+WHERE proizvod_id = <uuid-proizvoda>
+  AND korisnik_id = 11111111-1111-1111-1111-111111111111;
+
+-- INSERT koji uspijeva samo ako zapis NE POSTOJI
+INSERT INTO proizvodi (id, naziv, cijena, kategorija, dostupnost)
+VALUES (uuid(), 'Novi proizvod', 49.99, 'ostalo', true)
+IF NOT EXISTS;
+
+-- UPDATE koji uspijeva samo ako je trenutni status 'u_obradi'
+UPDATE narudzbe
+SET status = 'isporuceno'
+WHERE korisnik_id = 11111111-1111-1111-1111-111111111111
+  AND created_at = <timestamp-narudzbe>
+IF status = 'u_obradi';
+
+-- Logged BATCH je atomičan unutar iste particije
+BEGIN BATCH
+  INSERT INTO recenzije (proizvod_id, korisnik_id, ocjena, komentar, created_at)
+  VALUES (<uuid-monitora>, 22222222-2222-2222-2222-222222222222,
+          5, 'Odlična rezolucija.', toTimestamp(now()));
+
+  UPDATE recenzije
+  SET ocjena = 5
+  WHERE proizvod_id = <uuid-monitora>
+    AND korisnik_id = 22222222-2222-2222-2222-222222222222;
+APPLY BATCH;
+
+-- Zadatak 5
+
+UPDATE narudzbe
+SET status = 'isporuceno'
+WHERE korisnik_id = a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e
+  AND created_at = '2026-05-25 11:59:22.876000+0000'; 
+
+SELECT * 
+FROM narudzbe
+WHERE korisnik_id = a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e AND created_at = '2026-05-25 11:59:22.876000+0000';
+
+INSERT INTO proizvodi (id, naziv, cijena, kategorija, dostupnost)
+VALUES (a951d238-4125-4b88-96db-7bc6ea671731, 'Laptop', 999.99, 'elektronika', true)
+IF NOT EXISTS;
+
+DELETE FROM proizvodi WHERE id = 99c4d101-f177-43c4-9200-f81a4636a2ad;
+
+SELECT * FROM proizvodi WHERE id = 99c4d101-f177-43c4-9200-f81a4636a2ad;

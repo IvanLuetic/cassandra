@@ -5,3 +5,6 @@
 4.
 4.1. ALLOW FILTERING je problematično u produkciji zato što to skenira sve particije. Ovo bi uzrokovalo probleme u velikim bazama.
 4.2. Partition key određuje na koji čvor spremamo podatke, a clustering column određuje redoslijed podataka. U WHERE upitima partition key moramo koristiti (u suprotnome, sve particije se skeniraju), a clustering column možemo dodatno koristiti sa operatorima u upitima.
+
+5. Tombstone je marker koji Cassandra ostavlja nakon DELETE. On govori da je zapis obrisan, ali i dalje postoji na disku. Ovo se radi zbog sigurnosti, zato što je Cassandra distribuirana i podatak se nalazi na više replika. Compaction čisti Tombstone nakon što prođe određeni period (gc_grace_seconds).
+

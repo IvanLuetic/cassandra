@@ -261,3 +261,104 @@ IF NOT EXISTS;
 DELETE FROM proizvodi WHERE id = 99c4d101-f177-43c4-9200-f81a4636a2ad;
 
 SELECT * FROM proizvodi WHERE id = 99c4d101-f177-43c4-9200-f81a4636a2ad;
+
+-- Korak 6
+
+-- Kreiraj index na kategorija stupcu
+CREATE INDEX idx_kategorija ON proizvodi (kategorija);
+
+-- Sada query radi bez ALLOW FILTERING
+SELECT naziv, cijena FROM proizvodi
+WHERE kategorija = 'elektronika';
+
+-- Provjeri index
+DESCRIBE INDEX idx_kategorija;
+
+-- MV koji omogućuje pretragu narudžbi po gradu
+CREATE MATERIALIZED VIEW narudzbe_po_gradu AS
+  SELECT *
+  FROM narudzbe
+  WHERE grad IS NOT NULL
+    AND korisnik_id IS NOT NULL
+    AND created_at IS NOT NULL
+  PRIMARY KEY (grad, korisnik_id, created_at)
+  WITH CLUSTERING ORDER BY (korisnik_id ASC, created_at DESC);
+
+-- Efikasan query po gradu (bez ALLOW FILTERING)
+SELECT * FROM narudzbe_po_gradu
+WHERE grad = 'Zagreb';
+
+-- Ukupan broj narudžbi korisnika
+SELECT COUNT(*) AS broj_narudzbi
+FROM narudzbe
+WHERE korisnik_id = 11111111-1111-1111-1111-111111111111;
+
+-- Suma svih narudžbi korisnika
+SELECT SUM(ukupno) AS ukupna_potrosnja
+FROM narudzbe
+WHERE korisnik_id = 11111111-1111-1111-1111-111111111111;
+
+-- Prosječna ocjena za proizvod
+SELECT AVG(ocjena) AS prosjecna_ocjena, COUNT(*) AS broj_recenzija
+FROM recenzije
+WHERE proizvod_id = <uuid-laptopa>;
+
+-- Zadatak 6
+
+CREATE INDEX idx_proizvodi_dostupnost ON proizvodi (dostupnost);
+
+SELECT * FROM proizvodi WHERE dostupnost = true;
+
+CREATE MATERIALIZED VIEW narudzbe_po_statusu AS
+SELECT korisnik_id, created_at, narudzba_id, ukupno, status, grad
+FROM narudzbe
+WHERE status IS NOT NULL AND korisnik_id IS NOT NULL AND created_at IS NOT NULL
+PRIMARY KEY (status, korisnik_id, created_at)
+WITH CLUSTERING ORDER BY (korisnik_id ASC, created_at DESC);
+
+SELECT * FROM narudzbe_po_statusu WHERE status = 'isporuceno';
+
+SELECT SUM(ukupno) AS ukupna_potrosnja
+FROM narudzbe
+WHERE korisnik_id = a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e;
+
+SELECT AVG(ukupno) AS prosjecna_narudzba
+FROM narudzbe
+WHERE korisnik_id = a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e;
+
+-- Korak 7
+
+-- Zahtijeva da naziv proizvoda uvijek postoji
+ALTER TABLE proizvodi
+ADD CONSTRAINT naziv_nn CHECK (naziv IS NOT NULL);
+
+-- U novijim verzijama Cassandre (4.1+), direktno pri CREATE:
+-- naziv TEXT NOT NULL,
+
+-- Osigurava da je cijena uvijek pozitivna
+ALTER TABLE proizvodi
+ADD CONSTRAINT cijena_pozitivna CHECK (cijena > 0);
+
+-- Ocjena mora biti između 1 i 5
+ALTER TABLE recenzije
+ADD CONSTRAINT ocjena_raspon CHECK (ocjena >= 1 AND ocjena <= 5);
+
+-- Opis cijelog keyspace-a
+DESCRIBE KEYSPACE vjezba;
+
+-- Opis specifične tablice s PRIMARY KEY info
+DESCRIBE TABLE narudzbe;
+DESCRIBE TABLE narudzbe_po_gradu;
+
+-- Svi indeksi u keyspace-u
+SELECT * FROM system_schema.indexes
+WHERE keyspace_name = 'vjezba';
+
+-- Briše sve podatke, ali čuva tablicu (brže od DELETE sve particije)
+TRUNCATE TABLE recenzije;
+
+-- Briše tablicu kompletno
+DROP TABLE IF EXISTS recenzije;
+
+-- Briše cijeli keyspace (ne koristiti u produkciji bez backup-a!)
+DROP KEYSPACE IF EXISTS vjezba;

@@ -126,4 +126,71 @@ VALUES (a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e, '2024-01-15 10:30:00', uuid(), 89.
 INSERT INTO narudzbe (korisnik_id, created_at, narudzba_id, ukupno, status, grad)
 VALUES (a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e, '2024-01-15 10:30:00', uuid(), 29.99, 'isporuceno', 'Osijek');
 
-SELECT * FROM narudzbe WHERE korisnik_id = a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e;
+SELECT * FROM narudzbe WHERE korisnik_id = a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e
+
+--Korak 4
+
+SELECT korisnik_id, created_at, ukupno, status
+FROM narudzbe
+WHERE korisnik_id = 11111111-1111-1111-1111-111111111111;
+
+SELECT * FROM narudzbe
+WHERE korisnik_id = 11111111-1111-1111-1111-111111111111
+  AND created_at >= '2024-01-01 00:00:00+0000';
+
+SELECT * FROM narudzbe
+WHERE korisnik_id = 11111111-1111-1111-1111-111111111111
+LIMIT 2;
+
+SELECT naziv, cijena, kategorija, dostupnost
+FROM proizvodi;
+
+-- Filtriranje po non-partition key stupcu zahtijeva ALLOW FILTERING
+SELECT naziv, cijena FROM proizvodi
+WHERE kategorija = 'elektronika'
+ALLOW FILTERING;
+
+-- Ekvivalentno za dostupne proizvode
+SELECT naziv, cijena FROM proizvodi
+WHERE dostupnost = true
+ALLOW FILTERING;
+
+-- Umetni zapis koji automatski nestaje za 60 sekundi
+INSERT INTO narudzbe (korisnik_id, created_at, narudzba_id, ukupno, status, grad)
+VALUES (33333333-3333-3333-3333-333333333333,
+        toTimestamp(now()), uuid(), 9.99, 'test', 'Mostar')
+USING TTL 60;
+
+-- Provjeri preostali TTL
+SELECT TTL(status), TTL(ukupno), status, grad
+FROM narudzbe
+WHERE korisnik_id = 33333333-3333-3333-3333-333333333333;
+
+-- Nakon 60 sekundi zapis nestaje automatski
+
+-- Zadatak 4
+
+SELECT * FROM 
+narudzbe 
+WHERE korisnik_id = a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e
+ORDER BY created_at ASC;
+
+SELECT *
+FROM narudzbe
+WHERE status = 'isporuceno'
+ALLOW FILTERING;
+
+INSERT INTO narudzbe (korisnik_id, created_at, narudzba_id, ukupno, status, grad)
+VALUES (a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e, 
+        '2024-01-15 11:00:00', uuid(), 149.99, 'isporuceno', 'Osijek')
+USING TTL 30;
+
+SELECT TTL(status) as TTL, ukupno, status 
+FROM narudzbe 
+WHERE korisnik_id = a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e 
+  AND created_at = '2024-01-15 11:00:00';
+
+SELECT *
+FROM narudzbe 
+WHERE korisnik_id = a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e 
+  AND created_at = '2024-01-15 11:00:00';

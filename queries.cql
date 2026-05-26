@@ -87,7 +87,7 @@ VALUES (a3b7c9d2-1e4f-4a5b-8c3d-9e2f1a4b7c8d,
 
 -- Narudžbe korisnika B (2 narudžbe)
 INSERT INTO narudzbe (korisnik_id, created_at, narudzba_id, ukupno, status, grad)
-VALUES (f6e8d7c5-2b3a-4d9e-8f1c-7e6d5c4b3a2f,
+VALUES (f6e8d7c5-2b3a-4d9e-8f1c-7e6d5c4b3a2f ,
         toTimestamp(now()), uuid(), 499.00, 'isporuceno', 'Split');
 
 INSERT INTO narudzbe (korisnik_id, created_at, narudzba_id, ukupno, status, grad)
@@ -362,3 +362,182 @@ DROP TABLE IF EXISTS recenzije;
 
 -- Briše cijeli keyspace (ne koristiti u produkciji bez backup-a!)
 DROP KEYSPACE IF EXISTS vjezba;
+
+-- Zavrsni Zadatak
+
+CREATE TABLE tecaj (
+  tecaj_id UUID PRIMARY KEY,
+  naziv TEXT,
+  instruktor TEXT,
+  kategorija TEXT,
+  cijena DECIMAL,
+  trajanje_sati INT
+);
+
+CREATE TABLE upis (
+  student_id UUID,
+  tecaj_id UUID,
+  datum_upisa TIMESTAMP,
+  napredak INT,
+  status TEXT,
+  PRIMARY KEY (student_id, tecaj_id)
+);
+
+CREATE TABLE lekcija (
+  tecaj_id UUID,
+  redni_broj INT,
+  naslov TEXT,
+  trajanje_min INT,
+  sadrzaj_url TEXT,
+  PRIMARY KEY (tecaj_id, redni_broj)
+) WITH CLUSTERING ORDER BY (redni_broj ASC);
+
+--insert tečaja
+
+INSERT INTO tecaj (tecaj_id, naziv, instruktor, kategorija, cijena, trajanje_sati)
+VALUES (11111111-1111-1111-1111-111111111111, 'Python', 'Ivan', 'programiranje', 199.99, 40);
+
+INSERT INTO tecaj (tecaj_id, naziv, instruktor, kategorija, cijena, trajanje_sati)
+VALUES (22222222-2222-2222-2222-222222222222, 'Java', 'Ana', 'programiranje', 249.99, 35);
+
+INSERT INTO tecaj (tecaj_id, naziv, instruktor, kategorija, cijena, trajanje_sati)
+VALUES (33333333-3333-3333-3333-333333333333, 'SQL baze podataka', 'Marko', 'baze_podataka', 179.99, 30);
+
+INSERT INTO tecaj (tecaj_id, naziv, instruktor, kategorija, cijena, trajanje_sati)
+VALUES (44444444-4444-4444-4444-444444444444, 'Cassandra', 'Daniel', 'baze_podataka', 299.99, 45);
+
+INSERT INTO tecaj (tecaj_id, naziv, instruktor, kategorija, cijena, trajanje_sati)
+VALUES (55555555-5555-5555-5555-555555555555, 'React', 'Tomislav', 'web_razvoj', 349.99, 50);
+
+--insert upisa
+
+INSERT INTO upis (student_id, tecaj_id, datum_upisa, napredak, status)
+VALUES (a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e, 11111111-1111-1111-1111-111111111111, toTimestamp(now()), 40, 'aktivan');
+
+INSERT INTO upis (student_id, tecaj_id, datum_upisa, napredak, status)
+VALUES (a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e, 22222222-2222-2222-2222-222222222222, toTimestamp(now()), 45, 'aktivan');
+
+INSERT INTO upis (student_id, tecaj_id, datum_upisa, napredak, status)
+VALUES (a4b7c9d2-1e5f-3a2b-8c3d-9e2f1a4b7c9e, 33333333-3333-3333-3333-333333333333, toTimestamp(now()), 100, 'završen');
+
+INSERT INTO upis (student_id, tecaj_id, datum_upisa, napredak, status)
+VALUES (a3b7c9d2-1e4f-4a5b-8c3d-9e2f1a4b7c8d, 22222222-2222-2222-2222-222222222222, toTimestamp(now()), 50, 'aktivan');
+
+INSERT INTO upis (student_id, tecaj_id, datum_upisa, napredak, status)
+VALUES (a3b7c9d2-1e4f-4a5b-8c3d-9e2f1a4b7c8d, 44444444-4444-4444-4444-444444444444, toTimestamp(now()), 65, 'aktivan');
+
+INSERT INTO upis (student_id, tecaj_id, datum_upisa, napredak, status)
+VALUES (a3b7c9d2-1e4f-4a5b-8c3d-9e2f1a4b7c8d, 33333333-3333-3333-3333-333333333333, toTimestamp(now()), 10, 'aktivan');
+
+INSERT INTO upis (student_id, tecaj_id, datum_upisa, napredak, status)
+VALUES (f6e8d7c5-2b3a-4d9e-8f1c-7e6d5c4b3a2f , 11111111-1111-1111-1111-111111111111, toTimestamp(now()), 30, 'aktivan');
+
+INSERT INTO upis (student_id, tecaj_id, datum_upisa, napredak, status)
+VALUES (f6e8d7c5-2b3a-4d9e-8f1c-7e6d5c4b3a2f , 44444444-4444-4444-4444-444444444444, toTimestamp(now()), 90, 'aktivan');
+
+INSERT INTO upis (student_id, tecaj_id, datum_upisa, napredak, status)
+VALUES (f6e8d7c5-2b3a-4d9e-8f1c-7e6d5c4b3a2f , 33333333-3333-3333-3333-333333333333, toTimestamp(now()), 20, 'aktivan');
+
+INSERT INTO upis (student_id, tecaj_id, datum_upisa, napredak, status)
+VALUES (f6e8d7c5-2b3a-4d9e-8f1c-7e6d5c4b3a2f , 22222222-2222-2222-2222-222222222222, toTimestamp(now()), 15, 'aktivan');
+
+--insert lekcija
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (11111111-1111-1111-1111-111111111111, 1, 'Uvod u Python', 15, 'https://example.com/tecaj1/lekcija1');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (11111111-1111-1111-1111-111111111111, 2, 'Varijable i tipovi podataka', 25, 'https://example.com/tecaj1/lekcija2');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (11111111-1111-1111-1111-111111111111, 3, 'Kontrola toka', 30, 'https://example.com/tecaj1/lekcija3');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (11111111-1111-1111-1111-111111111111, 4, 'Funkcije i moduli', 20, 'https://example.com/tecaj1/lekcija4');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (22222222-2222-2222-2222-222222222222, 1, 'Generatori', 25, 'https://example.com/tecaj2/lekcija1');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (22222222-2222-2222-2222-222222222222, 2, 'Rad s datotekama i JSON', 20, 'https://example.com/tecaj2/lekcija2');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (22222222-2222-2222-2222-222222222222, 3, 'Asinkrono programiranje', 35, 'https://example.com/tecaj2/lekcija3');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (22222222-2222-2222-2222-222222222222, 4, 'Testiranje i debugging', 20, 'https://example.com/tecaj2/lekcija4');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (33333333-3333-3333-3333-333333333333, 1, 'SELECT i WHERE uvjeti', 20, 'https://example.com/tecaj3/lekcija1');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (33333333-3333-3333-3333-333333333333, 2, 'JOIN i podupiti', 30, 'https://example.com/tecaj3/lekcija2');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (33333333-3333-3333-3333-333333333333, 3, 'Indeksi i optimizacija', 25, 'https://example.com/tecaj3/lekcija3');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (44444444-4444-4444-4444-444444444444, 1, 'Data modeliranje u Cassandri', 30, 'https://example.com/tecaj4/lekcija1');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (44444444-4444-4444-4444-444444444444, 2, 'Primary key dizajn', 25, 'https://example.com/tecaj4/lekcija2');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (44444444-4444-4444-4444-444444444444, 3, 'TTL i tombstone-ovi', 20, 'https://example.com/tecaj4/lekcija3');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (55555555-5555-5555-5555-555555555555, 1, 'Komponente i props', 25, 'https://example.com/tecaj5/lekcija1');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (55555555-5555-5555-5555-555555555555, 2, 'State i lifecycle', 30, 'https://example.com/tecaj5/lekcija2');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (55555555-5555-5555-5555-555555555555, 3, 'Hooks', 20, 'https://example.com/tecaj5/lekcija3');
+
+INSERT INTO lekcija (tecaj_id, redni_broj, naslov, trajanje_min, sadrzaj_url)
+VALUES (55555555-5555-5555-5555-555555555555, 4, 'React Router', 15, 'https://example.com/tecaj5/lekcija4');
+
+-- Upiti
+
+SELECT * FROM lekcija 
+WHERE tecaj_id = 11111111-1111-1111-1111-111111111111 
+ORDER BY redni_broj ASC;
+
+SELECT tecaj_id, datum_upisa, napredak, status 
+FROM upis 
+WHERE student_id = a3b7c9d2-1e4f-4a5b-8c3d-9e2f1a4b7c8d;
+
+UPDATE upis 
+SET napredak = 85, status = 'u_tijeku' 
+WHERE student_id = a3b7c9d2-1e4f-4a5b-8c3d-9e2f1a4b7c8d
+  AND tecaj_id = 33333333-3333-3333-3333-333333333333;
+
+SELECT * FROM upis 
+WHERE student_id = a3b7c9d2-1e4f-4a5b-8c3d-9e2f1a4b7c8d
+  AND tecaj_id = 33333333-3333-3333-3333-333333333333;
+
+
+INSERT INTO upis (student_id, tecaj_id, datum_upisa, napredak, status)
+VALUES (a3b7c9d2-1e4f-4a5b-8c3d-9e2f1a4b7c8d, 44444444-4444-4444-4444-444444444444, 
+        toTimestamp(now()), 0, 'probni_pristup')
+USING TTL 604800;
+
+SELECT student_id, tecaj_id, status, TTL(status)
+FROM upis
+WHERE student_id = a3b7c9d2-1e4f-4a5b-8c3d-9e2f1a4b7c8d;
+
+CREATE MATERIALIZED VIEW tecajevi_po_kategoriji AS
+SELECT kategorija, tecaj_id, naziv, instruktor, cijena, trajanje_sati
+FROM tecaj
+WHERE kategorija IS NOT NULL AND tecaj_id IS NOT NULL
+PRIMARY KEY (kategorija, tecaj_id);
+
+SELECT * FROM tecajevi_po_kategoriji WHERE kategorija = 'programiranje';
+
+SELECT tecaj_id, COUNT(*) as broj_upisa 
+FROM upis 
+ALLOW FILTERING;
+
+SELECT student_id, AVG(napredak) AS napredak_prosjek
+FROM upis
+WHERE student_id = a3b7c9d2-1e4f-4a5b-8c3d-9e2f1a4b7c8d;
